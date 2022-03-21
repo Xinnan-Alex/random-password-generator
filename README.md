@@ -2,4 +2,4 @@
 
 MINI IT PROJECT ASSIGNMENT
 
-Languague used: Python
+Language used: Python
