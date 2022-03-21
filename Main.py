@@ -1,0 +1,1095 @@
+###
+#/***************************************************
+#File Name    : Main.py
+#Version/Date : FINAL (2020-06-02)
+#Programmer/ID: Chin Pei Wern (1191101668)
+#Project Name : Random Password Generator
+#Teammates    : Teh Su Anne, Leong Xin-Nan, Ooi Kher Ning
+#Course/Term  : PSP0201 Mini IT Project (2019/20 T3)
+#***************************************************/
+###
+
+##Modules of account management and password manager
+import account_management
+
+#Modules of password configuration and generation
+import new_password_MODIFIED
+
+#Modules of QRCODE and BARCODE generation
+import M3_OoiKherNing_1191100876_MODIFIED
+
+from tkinter import *
+import tkinter.messagebox   ##import messagebox
+from tkinter import Text, Tk    ##import textbox
+import csv
+import os.path
+from os import path
+from PIL import ImageTk,Image
+
+
+fieldnames2 = ["Facebook", "Instagram", "Twitter", "Snapchat", "LinkedIn","Google+","Youtube", "Pinterest", "Tumblr", "Reddit", "Quora", "Others"]
+
+window = Tk()
+window.title("Random Password Generator")
+
+#Change interface's frames
+def raise_frame(frame):
+	frame.tkraise()
+
+#menubar 
+menubar = Menu(window)
+filemenu = Menu(menubar, tearoff=0)
+filemenu.add_command(label="Home", command=lambda:first_frame_menubar_home())
+filemenu.add_separator()
+
+filemenu.add_command(label="Generate Password", command=lambda:first_frame_menubar_generatepassword())
+filemenu.add_command(label="Password Manager", command=lambda:first_frame_menubar_passwordmananger())
+filemenu.add_command(label="QR code", command=lambda:first_frame_menubar_qrcode())
+filemenu.add_command(label="Barcode" , command=lambda:first_frame_menubar_barcode())
+filemenu.add_command(label="Log out" ,command=lambda:first_frame_menubar_qrcode_logout())
+filemenu.add_separator()
+
+filemenu.add_command(label="Exit", command=window.quit)
+menubar.add_cascade(label="Menu", menu=filemenu)
+
+#logoutmenu = Menu(menubar, tearoff=0)
+
+window.config(menu=menubar)
+window.configure(bg="#222930")
+
+##frames 
+login = Frame(window)
+register = Frame(window)
+mainMenu = Frame(window)
+passwordStructure = Frame(window)
+social_media = Frame(window)
+confirm = Frame(window)
+randomised_password = Frame(window)
+deny = Frame(window)
+code = Frame(window)
+display = Frame(window)
+barcode_display = Frame(window)
+codePassword = Frame(window)
+randomPassword = Frame(window)
+codeoption = Frame(window)
+notes = Frame(window)
+notesbarcode = Frame(window)
+password_manager = Frame(window)
+socialmedia = Frame(window)
+work = Frame(window)
+entertainment = Frame(window)
+study = Frame(window)
+customise = Frame(window)
+
+
+
+for frame in (login, register, mainMenu, passwordStructure, social_media, confirm,
+			  randomised_password, deny, codeoption, codePassword, display,barcode_display, notes, notesbarcode,
+			  password_manager, randomPassword, socialmedia, work, entertainment, study, customise) :
+	frame.grid(row=0, column=0, sticky="news")
+	frame.configure(bg="#222930")
+
+window_height = 600
+window_width = 1180
+
+screen_width = window.winfo_screenwidth()
+screen_height = window.winfo_screenheight()
+
+x_cordinate = int((screen_width/2) - (window_width/2))
+y_cordinate = int((screen_height/2) - (window_height/2))
+
+window.geometry("{}x{}+{}+{}".format(window_width, window_height, x_cordinate, y_cordinate))
+  
+### after choosing password structure, confirmation  
+def popup_confirm():
+	result=tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with the option?")
+	if result=="yes":
+		window.destroy
+		raise_frame(randomised_password)
+	else:
+		window.destroy
+
+### confirmation qr code barcode
+def code_popup_confirm():
+	result=tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with the option?")
+	if result=="yes":
+		window.destroy
+		raise_frame(randomPassword)
+	else:
+		window.destroy
+ 
+def code_popupOption():
+	option = tkinter.messagebox.askquestion("OPTION", "Do you want to regenerate with the same structure?")
+	if option=="yes":
+		window.destroy
+		
+	else:
+		window.destroy
+		raise_frame(codePassword)
+		
+### after deny the generated password
+def popupOption():
+	option = tkinter.messagebox.askquestion("OPTION", "Do you want to regenerate with the same structure?")
+	if option=="yes":
+		window.destroy
+		generating_password()
+	else:
+		window.destroy
+		raise_frame(passwordStructure)
+
+#### message info for user ###        
+def info():
+	saved = tkinter.messagebox.showinfo("Data saved", "SAVED")
+	raise_frame(mainMenu)
+
+###after denying the generated password for QRcode / Barcode ###    
+def popupConfirm():
+	Result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with the option?")
+	if Result == "yes":
+		window.destroy
+		raise_frame(randomisedPassword)
+	else:
+		window.destroy
+		raise_frame(code)
+
+###confirm to change password in password manager
+def popupConfirmChanges():
+	result = tkinter.messagebox.askquestion("CHANGE PASSWORD", "Do you want to change the password?")
+	if result == "yes":
+		window.destroy
+		raise_frame(password)    
+	else:
+		window.destroy
+### confirm selection
+def popupQr():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with the option?")
+	if result == "yes":
+		window.destroy
+		raise_frame(notes)
+	else:
+		window.destroy
+		
+def popupBarcode():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with the option?")
+	if result == "yes":
+		window.destroy
+		raise_frame(notesbarcode)
+	else:
+		window.destroy
+
+def confirmCategory():
+	result = tkinter.messagebox.askquestion("CONFIRM", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(notes)
+	else:
+		window.destroy
+
+def confirmSm():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(socialmedia)
+	else:
+		window.destroy
+
+def confirmEnt():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(entertainment)
+	else:
+		window.destroy
+	 
+def confirmWork():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(work)
+	else:
+		window.destroy
+	  
+def confirmStudy():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(study)
+	else:
+		window.destroy
+
+def confirmCustomise():
+	result = tkinter.messagebox.askquestion("CONFIRMATION", "Do you confirm with your choice?")
+	if result == "yes":
+		window.destroy
+		raise_frame(customise)
+	else:
+		window.destroy
+
+###confirm to remove password from password manager        
+def popUpconfirmRemove():
+	result = tkinter.messagebox.askquestion("REMOVE PASSWORD", "Do you want to remove the password?")
+	if result == "yes":
+		window.destroy
+	
+	else:
+		window.destroy
+
+def confirmData():
+	result = tkinter.messagebox.askquestion("SAVE DATA", "Do you want to make any changes?")
+	if result == "yes":
+		window.destroy
+	else:
+		window.destroy
+		raise_frame(display)
+
+#Error window when invalid username/password
+def login_error():
+	result = tkinter.messagebox.showerror("ERROR", "Invalid Username/Passsword! Please try again!")
+
+def PNG_error():
+	result = tkinter.messagebox.showerror("ERROR", "Used Image Name! Please try again!")
+
+#Function that is giving the commands what to do when login details are valid/invalid
+def account_verify():
+	global login_status
+	login_status = account_management.datachecker(login_username,login_password)
+	if login_status == True:
+		global currentuser
+		currentuser = entUsername.get()
+		raise_frame(mainMenu)
+	else:
+		login_error()
+
+	entUsername.delete(0,END)
+	entPassword.delete(0,END)
+
+#Function for validating login details for menubar of first frame [Generate Password Button]
+def first_frame_menubar_generatepassword():
+	if login_status == True:
+		raise_frame(passwordStructure)
+	else:
+		login_error()
+
+#Function for validating login details for menubar of first frame [Passowrd Manger Button]
+def first_frame_menubar_passwordmananger():
+	if login_status == True:
+		raise_frame(password_manager)
+	else:
+		login_error()
+
+#Function for validating login details for menubar of first frame [QR Code/Bar Code Button]
+def first_frame_menubar_qrcode():
+	if login_status == True:
+		raise_frame(codeoption)
+	else:
+		login_error()
+
+#Function for logout button
+def first_frame_menubar_qrcode_logout():
+	global login_status
+	login_status = False
+	raise_frame(login)
+
+	
+#Function for validating login details for menubar of first frame [Home Button]
+def first_frame_menubar_home():
+	if login_status == True:
+		raise_frame(mainMenu)
+	else:
+		login_error()
+
+def first_frame_menubar_barcode():
+	if login_status ==  True:
+		raise_frame(notesbarcode)
+	else:
+		login_error()
+
+#fuction of regsitering account
+def registration():
+	status = account_management.registered_account(registerusername,registerpassword)
+	if status == True:
+		login_error()
+	else:
+		account_management.adding_account(registerusername,registerpassword)
+		result = tkinter.messagebox.showinfo("", "Account created successfully!")
+		raise_frame(login)
+	
+	entusername.delete(0,END)
+	entpassword.delete(0,END)
+
+#function of password manager
+def password_manager_display(user):
+	with open('./Passwords/'+user+'.csv','r+') as passwordfile:
+		reader = csv.DictReader(passwordfile,fieldnames=fieldnames2)
+		next(reader)
+		global facebookpass,instagrampass,twitterpass,snapchatpass,linkedinpass,googlepluspass,youtubepass,pinterestpass,tumblrpass,redditpass,quorapass,otherspass
+		facebookpass=[]
+		instagrampass=[]
+		twitterpass=[]
+		snapchatpass=[]
+		linkedinpass=[]
+		googlepluspass=[]
+		youtubepass=[]
+		pinterestpass=[]
+		tumblrpass=[]
+		redditpass=[]
+		quorapass=[]
+		otherspass=[]
+		for line in reader:
+			if len(line["Facebook"])>0: 
+				facebookpass.append(line["Facebook"])
+			elif len(line["Instagram"])>0: 
+				instagrampass.append(line["Instagram"])
+			elif len(line["Twitter"])>0: 
+				twitterpass.append(line["Twitter"])
+			elif len(line["Snapchat"])>0: 
+				snapchatpass.append(line["Snapchat"])
+			elif len(line["LinkedIn"])>0: 
+				linkedinpass.append(line["LinkedIn"])
+			elif len(line["Google+"])>0: 
+				googlepluspass.append(line["Google+"])
+			elif len(line["Youtube"])>0: 
+				youtubepass.append(line["Youtube"])
+			elif len(line["Pinterest"])>0: 
+				pinterestpass.append(line["Pinterest"])
+			elif len(line["Tumblr"])>0: 
+				tumblrpass.append(line["Tumblr"])
+			elif len(line["Reddit"])>0: 
+				redditpass.append(line["Reddit"])
+			elif len(line["Quora"])>0: 
+				quorapass.append(line["Quora"])
+			elif len(line["Others"])>0: 
+				otherspass.append(line["Others"])
+
+#function of saving password in password manager
+def saving_password():
+	if selectedcat_index == 0:
+		selectedcategory = "Facebook"
+	if selectedcat_index == 1:
+		selectedcategory = "Instagram"
+	if selectedcat_index == 2:
+		selectedcategory = "Twitter"
+	if selectedcat_index == 3:
+		selectedcategory = "Snapchat"
+	if selectedcat_index == 4:
+		selectedcategory = "LinkedIn"
+	if selectedcat_index == 5:
+		selectedcategory = "Google+"
+	if selectedcat_index == 6:
+		selectedcategory = "Youtube"
+	if selectedcat_index == 7:
+		selectedcategory = "Pinterest"
+	if selectedcat_index == 8:
+		selectedcategory = "Tumblr"
+	if selectedcat_index == 9:
+		selectedcategory = "Reddit"
+	if selectedcat_index == 10:
+		selectedcategory = "Quora"
+	if selectedcat_index == 11:
+		selectedcategory = "Others"
+	new_password_MODIFIED.savePassword(currentuser,generatedpass,selectedcategory)
+
+#function of generating password
+def generating_password():
+	password_length = length.get()
+	letterlower = option1.get()
+	letterupper = option2.get()
+	digit = option3.get()
+	specialchar = option4.get()
+	if letterupper == 0 and letterlower == 0 and digit == 0 and specialchar == 0:
+		result = tkinter.messagebox.showerror("ERROR", "Please atleast select one option type!")
+	else:
+		popup_confirm()
+		global generatedpass
+		generatedpass = new_password_MODIFIED.generatePassword(password_length,letterlower,letterupper,digit,specialchar)
+		password_displayed.set(generatedpass)
+
+#function of removing password
+def removing_pass(selectedcat_index):
+	if selectedcat_index == 0:
+		selectedcategory = "Facebook"
+	if selectedcat_index == 1:
+		selectedcategory = "Instagram"
+	if selectedcat_index == 2:
+		selectedcategory = "Twitter"
+	if selectedcat_index == 3:
+		selectedcategory = "Snapchat"
+	if selectedcat_index == 4:
+		selectedcategory = "LinkedIn"
+	if selectedcat_index == 5:
+		selectedcategory = "Google+"
+	if selectedcat_index == 6:
+		selectedcategory = "Youtube"
+	if selectedcat_index == 7:
+		selectedcategory = "Pinterest"
+	if selectedcat_index == 8:
+		selectedcategory = "Tumblr"
+	if selectedcat_index == 9:
+		selectedcategory = "Reddit"
+	if selectedcat_index == 10:
+		selectedcategory = "Quora"
+	if selectedcat_index == 11:
+		selectedcategory = "Others"
+	account_management.deletePassword(currentuser,selectedpass,selectedcategory)
+
+#function of generating a QRCODE
+def Proceed_QRCODE():
+	qrcode_notes = QR_textbox.get("1.0","end"+"-1c")
+	QRcode_PNG = QRPNG_name.get()+'.png'
+	if len(qrcode_notes)<1 or len(QRcode_PNG)<1:
+		result = tkinter.messagebox.showerror("ERROR", "Please fill in all the box!")
+	else:
+		if M3_OoiKherNing_1191100876_MODIFIED.duplicatePNG_checker(QRcode_PNG) == True:
+			PNG_error()
+			entQRPNG_name.delete(0,END)
+		else:
+			if selectedcategory_QRorBAR_code == 'customise':
+				cust_cat = custom_cat.get()
+				cust_subject = custom_subject.get()
+				M3_OoiKherNing_1191100876_MODIFIED.qrcode(cust_cat,cust_subject,qrcode_notes,QRcode_PNG)
+				entCust.delete(0,END)
+			else:
+				M3_OoiKherNing_1191100876_MODIFIED.qrcode(selectedcategory_QRorBAR_code,QRorBAR_Option2,qrcode_notes,QRcode_PNG)
+			
+			raise_frame(display)
+			img_var = Image.open('./QRcode/'+QRcode_PNG)
+			img = ImageTk.PhotoImage(img_var)
+			panel = Label(display, image = img)
+			panel.image = img
+			panel.grid(row= 3, column=0, columnspan=2, padx=20, pady=20)
+
+			QR_textbox.delete(1.0,END)
+			entQRPNG_name.delete(0,END)
+
+#function of generating a BARCODE
+def Proceed_BARCODE():
+	barcode_notes = BAR_note.get()
+	BARcode_PNG = BARPNG_name.get()+'.png'
+	BARcode_PNG2 = BARPNG_name.get()
+	if len(barcode_notes)<1 or len(BARcode_PNG)<1:
+		result = tkinter.messagebox.showerror("ERROR", "Please fill in all the box!")
+	else:
+		if M3_OoiKherNing_1191100876_MODIFIED.duplicatePNG_checker(BARcode_PNG) == True:
+			PNG_error()
+			entBARPNG_name.delete(0,END)
+		else:
+			M3_OoiKherNing_1191100876_MODIFIED.barcode(barcode_notes,BARcode_PNG2)
+			
+			raise_frame(barcode_display)
+			canvas_barcode = Canvas(barcode_display, width = 1140, height = 300)
+			canvas_barcode.grid(row= 3, column=0, columnspan=2, padx=20, pady=20)
+			img_var = Image.open('./BARcode/'+BARcode_PNG)
+			img = ImageTk.PhotoImage(img_var)
+			canvas_barcode.image = img
+			canvas_barcode.create_image(20, 20, anchor=NW, image=img)
+
+			BAR_textbox.delete(0,END)
+			entBARPNG_name.delete(0,END)
+
+		
+#Function from account_management.py; purpose is to create data files; Users and Password
+account_management.datafilecreator()
+
+##frame 1
+lblUsername = Label(login, text="USERNAME: ", font="courier 13 bold", fg="#E9E9E9", bg="#222930",  height= 1)
+lblUsername.grid(row=1, column= 1,pady=20, sticky=E)
+
+
+lblPassword = Label(login, text="PASSWORD: ", font="courier 13 bold", fg="#E9E9E9", bg="#222930", height=1)
+lblPassword.grid(row=2, column = 1,pady=20, sticky=E)
+
+login_username = StringVar()
+entUsername = Entry(login, width=20, textvariable=login_username)
+entUsername.grid(row=1, column=2,sticky=W)
+
+login_password = StringVar()
+bullet = "\u2022"   ##bullet character###
+entPassword = Entry(login, width=20, textvariable=login_password, show=bullet)
+entPassword.grid(row=2, column=2, sticky=W)
+
+btnLogin = Button(login, bg="#4EB1BA", width= 10, text="LOG IN",font="system 10 bold",
+				   fg="#E9E9E9", command=lambda:account_verify())
+
+btnLogin.grid(row=3, column=1,columnspan=2, sticky="news", padx=500, pady=20)
+
+lblLogin = Label(login, text="Don't have an account?", font="verdana 8 italic",  fg="#E9E9E9", bg="#222930")
+lblLogin.grid(row=7, column=1, padx=30, pady=50, sticky=E)
+
+btnSignup = Button(login, bg="#4EB1BA",width=10, fg="#E9E9E9", 
+					text="SIGN UP", command=lambda:raise_frame(register))
+btnSignup.grid(row=7, column=2,pady=50, sticky=W)
+
+
+##frame 2 Register for new users
+lblRegister = Label(register, text="REGISTER YOUR ACCOUNT", fg="#E9E9E9", bg="#222930", font="fixedsys 17 bold")
+lblRegister.grid(row=0, column=0, columnspan=2, padx=500, pady=20)
+
+lblusername = Label(register, text="USERNAME: ", fg="#E9E9E9", bg="#222930", font="system 12 bold")
+lblusername.grid(row=1, column=0, padx=10, pady=10, sticky=E)
+
+lblMasterPassword = Label(register, text="MASTER PASSWORD: ", fg="#E9E9E9", bg="#222930", font="system 12 bold")
+lblMasterPassword.grid(row=2, column=0, padx= 10, pady= 10, sticky=E)
+
+registerusername = StringVar()
+entusername= Entry(register, width=20, bg="light grey", textvariable= registerusername)
+entusername.grid(row=1, column=1, sticky=W)
+
+registerpassword = StringVar()
+bullet = "\u2022"
+entpassword = Entry(register, width=20, bg="light grey", textvariable= registerpassword, show=bullet)
+entpassword.grid(row=2, column=1, sticky=W)
+
+btnRegister = Button(register, text="SIGN UP", font="system 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:registration())
+btnRegister.grid(row=4, column=0,columnspan=2, padx=200, pady=20)
+
+btnBack = Button(register, text="BACK TO MAIN PAGE", font="system 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(login))
+btnBack.grid(row=8, column=0 ,columnspan=2, padx= 50, pady=50)
+
+##frame 3 main menu
+lblmenu = Label(mainMenu, text="MAIN MENU", fg="#E9E9E9", bg="#222930", font="fixedsys 15 bold")
+lblmenu.grid(row=1, column=0, columnspan=2, padx=500, pady=20, sticky="news")
+
+btnNewPassword = Button(mainMenu, text="Generate New Password", fg="#E9E9E9", bg="#4EB1BA",
+					font="system 13", command=lambda:raise_frame(passwordStructure))
+btnNewPassword.grid(row=2, column=0,columnspan=2, padx=500, pady=15)
+
+btnManager = Button(mainMenu, text="Password Manager", 
+					font="system 13", bg="#4EB1BA", fg="#E9E9E9", command=lambda:raise_frame(password_manager))
+btnManager.grid(row=3, column=0, columnspan=2, padx=500, pady=15)
+
+btnQR = Button(mainMenu, text="QR code", font="system 13", bg="#4EB1BA", fg="#E9E9E9", 
+		command=lambda:raise_frame(codeoption))
+btnQR.grid(row=4, column=0, columnspan=2, padx=500, pady=15)
+
+btnBC = Button(mainMenu, text="Barcode", font="system 13", bg="#4EB1BA", fg="#E9E9E9", 
+		command=lambda:raise_frame(notesbarcode))
+btnBC.grid(row=5, column=0, columnspan=2, padx=500, pady=15)
+
+###frame 4 generate new password
+lblStructure = Label(passwordStructure, text="PASSWORD STRUCTURE", bg="#222930", fg="#E9E9E9", font="fixedsys 17 bold underline")
+lblStructure.grid(row=0, column=0, columnspan=4, padx=500, pady=15, sticky="news")
+ 
+lblLength = Label(passwordStructure, text="Password Length: (6-40)", bg="#222930", fg="#E9E9E9", font="verdana 10")
+lblLength.grid(row= 1, column = 0, columnspan=2, padx= 500, pady= 10, sticky=W)
+
+length = Scale(passwordStructure, from_=6, to=40, orient= HORIZONTAL, bg="#4EB1BA",  fg="#E9E9E9")
+length.grid(row=2,column=0, columnspan=2, padx=500, pady=10)
+
+
+option1 = BooleanVar()
+Checkbutton(passwordStructure, variable=option1, bg="#222930").grid(row=4, column=1, sticky=W)
+lblalpha = Label(passwordStructure, text="Alphabets lowercase(a-z)", bg="#222930", fg="#E9E9E9", font="verdana 10")
+lblalpha.grid(row=4, column=0, padx=200, pady=10, sticky=E)
+
+option2 = BooleanVar()
+Checkbutton(passwordStructure, variable=option2, bg="#222930").grid(row=5, column=1, sticky=W)
+lblAlpha = Label(passwordStructure, text="Alphabets uppercase(A-Z)", bg="#222930", fg="#E9E9E9", font="verdana 10")
+lblAlpha.grid(row=5, column=0, padx=200, pady=10, sticky=E)
+
+option3 = BooleanVar()
+Checkbutton(passwordStructure, variable=option3, bg="#222930").grid(row=6, column=1, sticky=W)
+lblDigits = Label(passwordStructure, text="Digits", font="verdana 10", bg="#222930", fg="#E9E9E9")
+lblDigits.grid(row=6, column=0,padx=200, pady=10, sticky=E)
+
+option4 = BooleanVar()
+Checkbutton(passwordStructure, variable=option4, bg="#222930").grid(row=7, column=1, sticky=W)
+lblSpch = Label(passwordStructure, text="Special Characters", font="verdana 10", bg="#222930", fg="#E9E9E9")
+lblSpch.grid(row=7, column=0, padx=200, pady= 10, sticky=E)
+
+btnGenerate = Button(passwordStructure, text="GENERATE",font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=lambda:generating_password())
+btnGenerate.grid(row=8, column=1, padx=20, pady=30, sticky=W)
+
+btnBack = Button(passwordStructure, text="BACK TO MAIN MENU", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(mainMenu))
+btnBack.grid(row=11, column=0, columnspan=2 , padx= 500, pady=30, sticky="news")
+
+###if confirm, password generated
+lblPasswordGenerator = Label(randomised_password, text="PASSWORD GENERATOR", font="fixedsys 17 bold", fg="#E9E9E9", bg="#222930")
+lblPasswordGenerator.grid(row=0,columnspan=2, padx=500, pady=20, sticky="news")
+
+lblRandomisedPassword = Label(randomised_password, text="PASSWORD: ", font="system 10", bg="#222930", fg="#E9E9E9")
+lblRandomisedPassword.grid(row=1, column=0, columnspan=2, padx=400, pady=0, sticky=W)
+
+password_displayed = StringVar()
+entRandomisedPassword = Entry(randomised_password, width=55, state="readonly" ,bg="light grey", textvariable=password_displayed)
+entRandomisedPassword.grid(row=2, column=0,columnspan=2, padx=400, pady=20, sticky=W)
+
+
+btnAccept = Button(randomised_password, text="ACCEPT", font="courier 10", bg="#4EB1BA", fg="#E9E9E9", 
+			command=lambda:raise_frame(social_media))
+btnAccept.grid(row=3, column=0, padx=300, pady=20)
+
+btnDeny = Button(randomised_password, text="DENY", font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=popupOption)
+btnDeny.grid(row=3, column=0, padx=150, pady= 20, sticky=E)
+
+###frame 5 choose which social media to save into
+lblSocialMedia = Label(social_media, text="Choose from the following social media: ", bg="#222930", fg="#E9E9E9", font="arial 13")
+lblSocialMedia.grid(row=1, column=0, columnspan=2, padx=450, pady=20)
+
+listbox = Listbox(social_media, height=15, 
+				  width=30, 
+				  font="fixedsys 10", 
+				  fg="black")
+
+index = 1
+for i in ("Facebook", "Instagram", "Twitter", "Snapchat", "LinkedIn","Google+", 
+"Youtube", "Pinterest", "Tumblr", "Reddit", "Quora", "Others"):
+	listbox.insert(index, i)
+	index +=1
+
+def savedcat_onselect(cat):
+	selectedcat = cat.widget
+	index = (selectedcat.curselection()[0])
+	global selectedcat_index
+	selectedcat_index = index
+	
+
+listbox.bind('<<ListboxSelect>>', savedcat_onselect)
+listbox.grid(row=3, column=0, columnspan=2, padx=200, pady=0)
+
+btnProceed = Button(social_media, text="PROCEED",font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=lambda:[info(),saving_password()])
+btnProceed.grid(row=4, column=1, padx= 80, pady=20)
+
+###frame7 enter data  into which category
+lblCategory = Label(codeoption, text="CHOOSE CATEGORY: ", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblCategory.grid(row=1,column=0, columnspan=2, padx= 450, pady=20, sticky="news")
+
+listboxCategory = Listbox(codeoption, height=7, width=15, font="fixedsys 13", fg="black")
+
+btnCategory = Button(codeoption, text = "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(mainMenu))
+btnCategory.grid(row=5,column=1,padx= 500, pady=30, sticky= W)
+
+index = 1
+for i in ("Social Media", "Entertainment", "Work", "Study", "Customise"):
+	listboxCategory.insert(index, i)
+	index += 1
+listboxCategory.grid(row=3, column=0, columnspan=2, padx=500, pady=0)
+
+lblSm = Label(socialmedia, text= "SOCIAL MEDIA", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblSm.grid(row=1,column=0, columnspan=2, padx= 500, pady=20, sticky="news")
+
+btnBack = Button(socialmedia, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(codeoption))
+btnBack.grid(row=5, column=1, padx= 500, pady=30, sticky=W)
+
+listboxSocialMedia = Listbox(socialmedia, height=10, width=17, font="fixedsys 13", fg="black")
+
+for i in ('Facebook', 'Instagram', 'WeChat', 'Line', 'Snapchat', 'Google', 'Telegram', 'LinkedIn'):
+	listboxSocialMedia.insert( index, i)
+	index += 1
+listboxSocialMedia.grid(row=3, column=0, columnspan=2, padx=200, pady=0)
+
+##Entertainment
+lblEnt = Label(entertainment, text = "ENTERTAINMENT", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblEnt.grid(row=1,column=0, columnspan=2, padx= 500, pady=20, sticky="news")
+
+listboxEnt = Listbox(entertainment,height=10, width=17, font="fixedsys 13", fg="black")
+for i in ('Netflix', 'iFlix', 'YouTube', 'iQiyi', 'TikTok'):
+	listboxEnt.insert(index, i)
+	index += 1
+listboxEnt.grid(row=3, column=0, columnspan=2, padx=200, pady=0)
+
+btnBack = Button(entertainment, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(codeoption))
+btnBack.grid(row=5, column=1, padx= 500, pady=30, sticky=W)
+
+##work
+lblWork = Label(work, text = "WORK", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblWork.grid(row=1,column=0, columnspan=2, padx= 550, pady=20, sticky="news")
+
+listboxWork = Listbox(work,height=10, width=17, font="fixedsys 13", fg="black")
+for i in ('Bank', 'Office', 'Email', 'Contact'):
+	listboxWork.insert(index, i)
+	index += 1
+listboxWork.grid(row=3, column=0, columnspan=2, padx=200, pady=0)
+
+btnBack = Button(work, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(codeoption))
+btnBack.grid(row=5, column=1, padx= 500, pady=30, sticky=W)
+
+##study
+lblStudy = Label(study, text = "STUDY", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblStudy.grid(row=1,column=0, columnspan=2, padx= 550, pady=20, sticky="news")
+
+listboxStudy = Listbox(study,height=12, width=17, font="fixedsys 13", fg="black")
+for i in ('College', 'Coursera', 'High School', 'Tuition', 'Udemy', 'Duolingo', 'Memrise', 'Mathway'):
+	listboxStudy.insert(index, i)
+	index += 1
+listboxStudy.grid(row=3, column=0, columnspan=2, padx=200, pady=0)   
+
+btnBack = Button(study, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(codeoption))
+btnBack.grid(row=5, column=1, padx= 500, pady=30, sticky=W)
+
+##customise
+lblCust = Label(customise, text = "CUSTOMISE", font="fixedsys 20 bold", bg="#222930", fg="#E9E9E9")
+lblCust.grid(row=1,column=0, columnspan=2, padx=500, pady=20, sticky="news")
+
+lblCustomise = Label(customise, text="Please enter your desired custom category: ", font="system 10", bg="#222930", fg="#E9E9E9")
+lblCustomise.grid(row=2, column=0,padx=100, pady=10, sticky=E)
+
+custom_cat = StringVar()
+entCust = Entry(customise, width=20, bg="light grey", textvariable=custom_cat)
+entCust.grid(row=2, column=1, padx=0, sticky=W)
+
+lblCustomise_subject = Label(customise, text="Please enter your desired custom subject: ", font="system 10", bg="#222930", fg="#E9E9E9")
+lblCustomise_subject.grid(row=3, column=0,padx=100, pady=10, sticky=E)
+
+custom_subject = StringVar()
+entCust = Entry(customise, width=20, bg="light grey", textvariable=custom_subject)
+entCust.grid(row=3, column=1, padx=0, sticky=W)
+
+def InputValidation():
+	if len((custom_cat.get()).strip())<1 or len((custom_subject.get()).strip())<1:
+		result = tkinter.messagebox.showerror("ERROR", "Empty Custom Category or Subject! Please input your desired category and subject!")
+	else:
+		raise_frame(notes)
+
+btnNext = Button(customise, text= "NEXT", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:InputValidation())
+btnNext.grid(row=5, column=0, padx= 350, pady=30, sticky="news")
+
+btnBack = Button(customise, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(codeoption))
+btnBack.grid(row=5, column=1, padx= 200, pady=30, sticky="news")
+
+def category_onselect(option):
+	w = option.widget
+	global selectedcategory_QRorBAR_code
+	index = (w.curselection()[0])
+	if index == 0:
+		selectedcategory_QRorBAR_code = 'social media'
+		confirmSm()
+	if index == 1:
+		selectedcategory_QRorBAR_code = 'entertainment'
+		confirmEnt()
+	if index == 2:
+		selectedcategory_QRorBAR_code = 'work'
+		confirmWork()
+	if index == 3:
+		selectedcategory_QRorBAR_code = 'study'
+		confirmStudy()
+	if index == 4:
+		selectedcategory_QRorBAR_code = 'customise'
+		confirmCustomise()
+
+def SM_onselect(option):
+	w = option.widget
+	global QRorBAR_Option2
+	index = (w.curselection()[0])
+	confirmCategory()
+	if index == 0:
+		QRorBAR_Option2 = 'Facebook'
+	if index == 1:
+		QRorBAR_Option2 = 'Instagram'
+	if index == 2:
+		QRorBAR_Option2 = 'WeChat'
+	if index == 3:
+		QRorBAR_Option2 = 'Line'
+	if index == 4:
+		QRorBAR_Option2 = 'Snapchat'
+	if index == 5:
+		QRorBAR_Option2 = 'Google'
+	if index == 6:
+		QRorBAR_Option2 = 'Telegram'
+	if index == 7:
+		QRorBAR_Option2 = 'LinkedIn'
+
+def ENT_onselect(option):
+	w = option.widget
+	global QRorBAR_Option2
+	index = (w.curselection()[0])
+	confirmCategory()
+	if index == 0:
+		QRorBAR_Option2 = 'Netflix'
+	if index == 1:
+		QRorBAR_Option2 = 'iFlix'
+	if index == 2:
+		QRorBAR_Option2 = 'YouTube'
+	if index == 3:
+		QRorBAR_Option2 = 'iQiyi'
+	if index == 4:
+		QRorBAR_Option2 = 'TikTok'
+
+def work_onselect(option):
+	w = option.widget
+	global QRorBAR_Option2
+	index = (w.curselection()[0])
+	confirmCategory()
+	if index == 0:
+		QRorBAR_Option2 = 'Bank'
+	if index == 1:
+		QRorBAR_Option2 = 'Office'
+	if index == 2:
+		QRorBAR_Option2 = 'Email'
+	if index == 3:
+		QRorBAR_Option2 = 'Contact'
+
+def study_onselect(option):
+	w = option.widget
+	global QRorBAR_Option2
+	index = (w.curselection()[0])
+	confirmCategory()
+	if index == 0:
+		QRorBAR_Option2 = 'College'
+	if index == 1:
+		QRorBAR_Option2 = 'Coursera'
+	if index == 2:
+		QRorBAR_Option2 = 'High School'
+	if index == 3:
+		QRorBAR_Option2 = 'Tuition'
+	if index == 4:
+		QRorBAR_Option2 = 'Udemy'
+	if index == 5:
+		QRorBAR_Option2 = 'Duolingo'
+	if index == 6:
+		QRorBAR_Option2 = 'Memrise'
+	if index == 7:
+		QRorBAR_Option2 = 'Mathway'
+
+listboxCategory.bind('<<ListboxSelect>>', category_onselect)   
+listboxSocialMedia.bind('<<ListboxSelect>>', SM_onselect)
+listboxEnt.bind('<<ListboxSelect>>', ENT_onselect)
+listboxWork.bind('<<ListboxSelect>>', work_onselect)
+listboxStudy.bind('<<ListboxSelect>>', study_onselect)
+
+##notes for qrcode
+##interface for the user to type in important notes
+lbldata = Label(notes, text="IMPORTANT DATA", font="fixedsys 17 bold underline", bg="#222930", fg="#E9E9E9")
+lbldata.grid(row=1, column=0, columnspan=2, padx=500, pady=20, sticky="news")
+
+QR_textbox = Text(notes, height=20, width=40)
+QR_textbox.grid(row=2, columnspan=2, padx=350, pady=0)
+
+lblPNG_name = Label(notes, text="PNG NAME:",font="system", bg="#222930", fg="#E9E9E9")
+lblPNG_name.grid(row=9, column=0, padx=10, pady=15, sticky= E)
+
+QRPNG_name = StringVar()
+entQRPNG_name = Entry(notes, width=20, textvariable = QRPNG_name, bg="light grey")
+entQRPNG_name.grid(row=9, column=1, sticky=W)
+
+btnNotes = Button(notes, text="PROCEED",font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=lambda:[confirmData,Proceed_QRCODE()])
+btnNotes.grid(row= 10, column=0, padx=30, pady=10, sticky=E)
+
+#function for making the back button in QRCODE's note frame going back to the previous subjects depends on the cateogry they first chose
+def backButton():
+	if selectedcategory_QRorBAR_code == 'social media':
+		raise_frame(socialmedia)
+	elif selectedcategory_QRorBAR_code == 'entertainment':
+		raise_frame(entertainment)
+	elif selectedcategory_QRorBAR_code == 'work':
+		raise_frame(work)
+	elif selectedcategory_QRorBAR_code == 'study':
+		raise_frame(study)
+	elif selectedcategory_QRorBAR_code == 'customise':
+		raise_frame(customise)
+
+btnBack = Button(notes, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:backButton())
+btnBack.grid(row=10, column=1, padx= 50, pady=10, sticky=W)
+
+
+#QR code display
+lblcode = Label(display, text="QR CODE", font="fixedsys 17 bold", bg="#222930", fg="#E9E9E9")
+lblcode.grid(row=0, column=0, columnspan=2, padx=500, pady=20, sticky="news")
+
+lblCode = Label(display, text="Please scan the QR code below:", font="system", bg="#222930", fg="#E9E9E9")
+lblCode.grid(row=1, column=0, columnspan=2, padx=400, pady=0)
+
+btnCode = Button(display, text="BACK TO MAIN MENU", font="courier 10", bg="#4EB1BA", fg="#E9E9E9",command=lambda:raise_frame(mainMenu))
+btnCode.grid(row=5, column=0, columnspan=2, padx=400, pady=20)
+
+###notes for barcode
+##interface for the user to type in important notes
+lbldata = Label(notesbarcode, text="IMPORTANT DATA", font="fixedsys 17 bold underline", bg="#222930", fg="#E9E9E9")
+lbldata.grid(row=1, column=0, columnspan=3, padx=500, pady=20, sticky="news")
+
+lbldata = Label(notesbarcode, text="*Recommended for minor data that have at most 10 letters*", font="arial 10 italic", bg="#222930", fg="#E9E9E9")
+lbldata.grid(row=2, column=0, columnspan=3, padx=300, pady=20, sticky="news")
+
+#function of limiting the BAR_textbox entry box to only 30 letters
+def correct(inp):
+	if len(inp)<31:
+		return True
+	else:
+		return False
+
+BAR_note = StringVar()
+BAR_textbox = Entry(notesbarcode,width = 20,textvariable = BAR_note)
+BAR_textbox.grid(row=3, column=1, sticky=W)
+reg = window.register(correct)
+BAR_textbox.config(validate='key',validatecommand=(reg,'%P'))
+
+lblPNG_name = Label(notesbarcode, text="PNG NAME:",font="system", bg="#222930", fg="#E9E9E9")
+lblPNG_name.grid(row=9, column=0, padx=100, pady=15, sticky= E)
+
+BARPNG_name = StringVar()
+entBARPNG_name = Entry(notesbarcode, width=20, textvariable = BARPNG_name)
+entBARPNG_name.grid(row=9, column=1, sticky=W)
+
+btnNotes = Button(notesbarcode, text="PROCEED",font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=lambda:[confirmData,Proceed_BARCODE()])
+btnNotes.grid(row= 10, column= 0, padx=90, pady=10, sticky=E)
+
+btnBack = Button(notesbarcode, text= "BACK", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(mainMenu))
+btnBack.grid(row=10, column=1, padx= 50,pady=10, sticky=W)
+
+
+#barcode display
+lblcode = Label(barcode_display, text="BARCODE", font="fixedsys 17 bold", bg="#222930", fg="#E9E9E9")
+lblcode.grid(row=0, column=0, columnspan=2, padx=500, pady=20, sticky="news")
+
+lblCode = Label(barcode_display, text="Please scan the barcode below:", font="system", bg="#222930", fg="#E9E9E9")
+lblCode.grid(row=1, column=0, columnspan=2, padx=450, pady=0)
+
+btnCode = Button(barcode_display, text="BACK TO MAIN MENU", font="courier 10", bg="#4EB1BA", fg="#E9E9E9",command=lambda:raise_frame(mainMenu))
+btnCode.grid(row=5, column=0, columnspan=2, padx=450, pady=40)
+
+
+### frame7 manage password
+lblManagePassword = Label(password_manager, text="LIST OF SAVED PASSWORDS", font="fixedsys 17 bold underline", bg="#222930", fg="#E9E9E9")
+lblManagePassword.grid(row=1, column=0, columnspan=4, padx=500, pady=20, sticky="news")
+
+btnRemove = Button(password_manager, text="REMOVE",font="courier 10", bg="#4EB1BA", fg="#E9E9E9", command=lambda:[popUpconfirmRemove(),removing_pass(selectedcategory_index)])
+btnRemove.grid(row=3, column=1, padx=0, pady=0, sticky=NE)
+
+lblCat = Label(password_manager, text= "CATEGORIES", font= "system", bg="#222930", fg="#E9E9E9")
+lblCat.grid(row=2,column=0, padx=200, pady=0, sticky=E)
+
+lblpassword = Label(password_manager, text="PASSWORDS", font="system", bg="#222930", fg="#E9E9E9")
+lblpassword.grid(row=2, column=1, padx=10, pady=0, sticky= W)
+
+listboxCat = Listbox(password_manager, height=15, width=15, font="fixedsys 10", fg="black")
+listboxCat.grid(row=3, column=0, padx=200, pady=0, sticky=E)
+
+index_cat = 1
+for i in ("Facebook", "Instagram", "Twitter", "Snapchat", "LinkedIn","Google+", 
+"Youtube", "Pinterest", "Tumblr", "Reddit", "Quora", "Others"):
+	listboxCat.insert(index, i)
+	index_cat +=1
+
+password = Listbox(password_manager,height= 15, width= 43, font="fixedsys 10", fg="black")
+password.grid(row=3, column=1, padx=10, pady=0, sticky=W)
+
+
+def cat_onselect(pwd):
+	w = pwd.widget
+	index = (w.curselection()[0])
+	password_manager_display(currentuser)
+	if index == 0:
+		password.delete(0,'end')
+		index_password = 1
+		for i in facebookpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 1:
+		password.delete(0,'end')
+		index_password = 1
+		for i in instagrampass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 2:
+		password.delete(0,'end')
+		index_password = 1
+		for i in twitterpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 3:
+		password.delete(0,'end')
+		index_password = 1
+		for i in snapchatpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 4:
+		password.delete(0,'end')
+		index_password = 1
+		for i in linkedinpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 5:
+		password.delete(0,'end')
+		index_password = 1
+		for i in googlepluspass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 6:
+		password.delete(0,'end')
+		index_password = 1
+		for i in youtubepass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 7:
+		password.delete(0,'end')
+		index_password = 1
+		for i in pinterestpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 8:
+		password.delete(0,'end')
+		index_password = 1
+		for i in tumblrpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 9:
+		password.delete(0,'end')
+		index_password = 1
+		for i in redditpass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 10:
+		password.delete(0,'end')
+		index_password = 1
+		for i in quorapass:
+			password.insert(index_password, i)
+			index_password +=1
+	if index == 11:
+		password.delete(0,'end')
+		index_password = 1
+		for i in otherspass:
+			password.insert(index_password, i)
+			index_password +=1
+	global selectedcategory_index
+	selectedcategory_index= index
+
+def pass_onselect(passw):
+	q = passw.widget
+	index = (q.curselection()[0])
+	global selectedpass
+	if selectedcategory_index == 0:
+		print(facebookpass[index])
+		selectedpass = facebookpass[index]
+	if selectedcategory_index == 1:
+		print(instagrampass[index])
+		selectedpass = instagrampass[index]
+	if selectedcategory_index == 2:
+		print(twitterpass[index])
+		selectedpass = twitterpass[index]
+	if selectedcategory_index == 3:
+		print(snapchatpass[index])
+		selectedpass = snapchatpass[index]
+	if selectedcategory_index == 4:
+		print(linkedinpass[index])
+		selectedpass = linkedinpass[index]
+	if selectedcategory_index == 5:
+		print(googlepluspass[index])
+		selectedpass = googlepluspass[index]
+	if selectedcategory_index == 6:
+		print(youtubepass[index])
+		selectedpass = youtubepass[index]
+	if selectedcategory_index == 7:
+		print(pinterestpass[index])
+		selectedpass = pinterestpass[index]
+	if selectedcategory_index == 8:
+		print(tumblrpass[index])
+		selectedpass = tumblrpass[index]
+	if selectedcategory_index == 9:
+		print(redditpass[index])
+		selectedpass = redditpass[index]
+	if selectedcategory_index == 10:
+		print(quorapass[index])
+		selectedpass = quorapass[index]
+	if selectedcategory_index == 11:
+		print(otherspass[index])
+		selectedpass = otherspass[index]
+
+
+
+listboxCat.bind('<<ListboxSelect>>', cat_onselect)
+password.bind('<<ListboxSelect>>', pass_onselect)
+
+btnBack = Button(password_manager, text="BACK TO MAIN MENU", font="courier 10 bold", fg="#E9E9E9", bg="#4EB1BA", command=lambda:raise_frame(mainMenu))
+btnBack.grid(row=11, column=0, columnspan=4 , padx= 550, pady=70, sticky="news")
+
+raise_frame(login)
+window.mainloop()
